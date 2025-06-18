@@ -16,27 +16,19 @@ import routerBindings, {
   NavigateToResource,
   UnsavedChangesNotifier,
 } from "@refinedev/react-router";
-import dataProvider from "@refinedev/simple-rest";
+import { createRatchetDataProvider } from "./dataProvider";
 import { App as AntdApp } from "antd";
 import { BrowserRouter, Outlet, Route, Routes } from "react-router";
 import { authProvider } from "./authProvider";
 import { Header } from "./components/header";
 import { ColorModeContextProvider } from "./contexts/color-mode";
-import {
-  BlogPostCreate,
-  BlogPostEdit,
-  BlogPostList,
-  BlogPostShow,
-} from "./pages/blog-posts";
-import {
-  CategoryCreate,
-  CategoryEdit,
-  CategoryList,
-  CategoryShow,
-} from "./pages/categories";
 import { ForgotPassword } from "./pages/forgotPassword";
 import { Login } from "./pages/login";
 import { Register } from "./pages/register";
+import { TaskList, TaskCreate, TaskEdit, TaskShow } from "./pages/tasks";
+import { ExecutionList, ExecutionCreate, ExecutionShow } from "./pages/executions";
+import { JobList, JobCreate, JobEdit, JobShow } from "./pages/jobs";
+import { ScheduleList, ScheduleCreate, ScheduleEdit, ScheduleShow } from "./pages/schedules";
 
 function App() {
   return (
@@ -47,29 +39,53 @@ function App() {
           <AntdApp>
             <DevtoolsProvider>
               <Refine
-                dataProvider={dataProvider("https://api.fake-rest.refine.dev")}
+                dataProvider={createRatchetDataProvider("http://localhost:8080/api/v1")}
                 notificationProvider={useNotificationProvider}
                 routerProvider={routerBindings}
                 authProvider={authProvider}
                 resources={[
                   {
-                    name: "blog_posts",
-                    list: "/blog-posts",
-                    create: "/blog-posts/create",
-                    edit: "/blog-posts/edit/:id",
-                    show: "/blog-posts/show/:id",
+                    name: "tasks",
+                    list: "/tasks",
+                    create: "/tasks/create",
+                    edit: "/tasks/edit/:id",
+                    show: "/tasks/show/:id",
                     meta: {
-                      canDelete: true,
+                      canDelete: false,
+                      icon: "🔧",
                     },
                   },
                   {
-                    name: "categories",
-                    list: "/categories",
-                    create: "/categories/create",
-                    edit: "/categories/edit/:id",
-                    show: "/categories/show/:id",
+                    name: "executions",
+                    list: "/executions",
+                    create: "/executions/create",
+                    edit: "/executions/edit/:id",
+                    show: "/executions/show/:id",
+                    meta: {
+                      canDelete: false,
+                      icon: "▶️",
+                    },
+                  },
+                  {
+                    name: "jobs",
+                    list: "/jobs",
+                    create: "/jobs/create",
+                    edit: "/jobs/edit/:id",
+                    show: "/jobs/show/:id",
+                    meta: {
+                      canDelete: false,
+                      icon: "📋",
+                    },
+                  },
+                  {
+                    name: "schedules",
+                    list: "/schedules",
+                    create: "/schedules/create",
+                    edit: "/schedules/edit/:id",
+                    show: "/schedules/show/:id",
                     meta: {
                       canDelete: true,
+                      icon: "⏰",
                     },
                   },
                 ]}
@@ -98,19 +114,31 @@ function App() {
                   >
                     <Route
                       index
-                      element={<NavigateToResource resource="blog_posts" />}
+                      element={<NavigateToResource resource="tasks" />}
                     />
-                    <Route path="/blog-posts">
-                      <Route index element={<BlogPostList />} />
-                      <Route path="create" element={<BlogPostCreate />} />
-                      <Route path="edit/:id" element={<BlogPostEdit />} />
-                      <Route path="show/:id" element={<BlogPostShow />} />
+                    <Route path="/tasks">
+                      <Route index element={<TaskList />} />
+                      <Route path="create" element={<TaskCreate />} />
+                      <Route path="edit/:id" element={<TaskEdit />} />
+                      <Route path="show/:id" element={<TaskShow />} />
                     </Route>
-                    <Route path="/categories">
-                      <Route index element={<CategoryList />} />
-                      <Route path="create" element={<CategoryCreate />} />
-                      <Route path="edit/:id" element={<CategoryEdit />} />
-                      <Route path="show/:id" element={<CategoryShow />} />
+                    <Route path="/executions">
+                      <Route index element={<ExecutionList />} />
+                      <Route path="create" element={<ExecutionCreate />} />
+                      <Route path="edit/:id" element={<div>Edit Execution - Coming Soon</div>} />
+                      <Route path="show/:id" element={<ExecutionShow />} />
+                    </Route>
+                    <Route path="/jobs">
+                      <Route index element={<JobList />} />
+                      <Route path="create" element={<JobCreate />} />
+                      <Route path="edit/:id" element={<JobEdit />} />
+                      <Route path="show/:id" element={<JobShow />} />
+                    </Route>
+                    <Route path="/schedules">
+                      <Route index element={<ScheduleList />} />
+                      <Route path="create" element={<ScheduleCreate />} />
+                      <Route path="edit/:id" element={<ScheduleEdit />} />
+                      <Route path="show/:id" element={<ScheduleShow />} />
                     </Route>
                     <Route path="*" element={<ErrorComponent />} />
                   </Route>
