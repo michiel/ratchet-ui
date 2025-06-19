@@ -38,7 +38,7 @@ jobs:
           cp dist/assets/script.js cdn-assets/
           
           # Copy other assets that might be needed
-          cp dist/favicon.ico cdn-assets/
+          cp dist/assets/favicon.ico cdn-assets/
           
           # Create version info for cache busting
           SHORT_SHA="${{ github.sha }}"
