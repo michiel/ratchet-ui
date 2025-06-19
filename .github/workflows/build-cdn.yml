@@ -40,6 +40,11 @@ jobs:
           # Copy other assets that might be needed
           cp dist/favicon.ico cdn-assets/
           
+          # Create version info for cache busting
+          SHORT_SHA="${{ github.sha }}"
+          SHORT_SHA="${SHORT_SHA:0:7}"
+          echo "{\"commit\":\"${{ github.sha }}\",\"shortCommit\":\"${SHORT_SHA}\",\"buildTime\":\"$(date -u -Iseconds)\",\"version\":\"${SHORT_SHA}\"}" > cdn-assets/version.json
+          
           # Create a simple index file for reference
           echo "# Ratchet UI CDN Assets" > cdn-assets/README.md
           echo "" >> cdn-assets/README.md
@@ -49,10 +54,18 @@ jobs:
           echo "## Usage" >> cdn-assets/README.md
           echo '```html' >> cdn-assets/README.md
           echo '<!-- CSS -->' >> cdn-assets/README.md
-          echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/${{ github.repository }}@main-build/style.css">' >> cdn-assets/README.md
+          echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/${{ github.repository }}@main-build/style.css?v='${SHORT_SHA}'">' >> cdn-assets/README.md
           echo '' >> cdn-assets/README.md
           echo '<!-- JavaScript -->' >> cdn-assets/README.md
-          echo '<script src="https://cdn.jsdelivr.net/gh/${{ github.repository }}@main-build/script.js"></script>' >> cdn-assets/README.md
+          echo '<script src="https://cdn.jsdelivr.net/gh/${{ github.repository }}@main-build/script.js?v='${SHORT_SHA}'"></script>' >> cdn-assets/README.md
+          echo '```' >> cdn-assets/README.md
+          echo '' >> cdn-assets/README.md
+          echo "## Cache Busting" >> cdn-assets/README.md
+          echo "Use version.json to get current version for cache busting:" >> cdn-assets/README.md
+          echo '```javascript' >> cdn-assets/README.md
+          echo 'fetch("https://cdn.jsdelivr.net/gh/${{ github.repository }}@main-build/version.json")' >> cdn-assets/README.md
+          echo '  .then(r => r.json())' >> cdn-assets/README.md
+          echo '  .then(v => console.log("Current version:", v.version));' >> cdn-assets/README.md
           echo '```' >> cdn-assets/README.md
 
       - name: Deploy to main-build branch
