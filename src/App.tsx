@@ -30,6 +30,17 @@ import { ExecutionList, ExecutionCreate, ExecutionShow } from "./pages/execution
 import { JobList, JobCreate, JobEdit, JobShow } from "./pages/jobs";
 import { ScheduleList, ScheduleCreate, ScheduleEdit, ScheduleShow } from "./pages/schedules";
 
+// Configure API URL based on environment
+const getApiUrl = (): string => {
+  // In production (when served from CDN), use relative path
+  if (import.meta.env.PROD) {
+    return "/api/v1";
+  }
+  
+  // In development, use full localhost URL
+  return "http://localhost:8080/api/v1";
+};
+
 function App() {
   return (
     <BrowserRouter>
@@ -39,7 +50,7 @@ function App() {
           <AntdApp>
             <DevtoolsProvider>
               <Refine
-                dataProvider={createRatchetDataProvider("http://localhost:8080/api/v1")}
+                dataProvider={createRatchetDataProvider(getApiUrl())}
                 notificationProvider={useNotificationProvider}
                 routerProvider={routerBindings}
                 authProvider={authProvider}
