@@ -1,0 +1,66 @@
+name: Build and Deploy to CDN Branch
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    types: [ closed ]
+
+jobs:
+  build-and-deploy:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Prepare CDN assets
+        run: |
+          # Create a clean directory for CDN assets
+          mkdir -p cdn-assets
+          
+          # Copy and rename the hashed files to consistent names
+          cp dist/assets/*.css cdn-assets/style.css
+          cp dist/assets/*.js cdn-assets/script.js
+          
+          # Copy other assets that might be needed
+          cp dist/favicon.ico cdn-assets/
+          
+          # Create a simple index file for reference
+          echo "# Ratchet UI CDN Assets" > cdn-assets/README.md
+          echo "" >> cdn-assets/README.md
+          echo "Built from commit: ${{ github.sha }}" >> cdn-assets/README.md
+          echo "Built at: $(date -u)" >> cdn-assets/README.md
+          echo "" >> cdn-assets/README.md
+          echo "## Usage" >> cdn-assets/README.md
+          echo '```html' >> cdn-assets/README.md
+          echo '<!-- CSS -->' >> cdn-assets/README.md
+          echo '<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/${{ github.repository }}@main-build/style.css">' >> cdn-assets/README.md
+          echo '' >> cdn-assets/README.md
+          echo '<!-- JavaScript -->' >> cdn-assets/README.md
+          echo '<script src="https://cdn.jsdelivr.net/gh/${{ github.repository }}@main-build/script.js"></script>' >> cdn-assets/README.md
+          echo '```' >> cdn-assets/README.md
+
+      - name: Deploy to main-build branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./cdn-assets
+          publish_branch: main-build
+          force_orphan: true
+          enable_jekyll: false
+          commit_message: 'Deploy CDN assets from ${{ github.sha }}'
