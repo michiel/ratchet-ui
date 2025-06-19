@@ -33,9 +33,9 @@ jobs:
           # Create a clean directory for CDN assets
           mkdir -p cdn-assets
           
-          # Copy and rename the hashed files to consistent names
-          cp dist/assets/*.css cdn-assets/style.css
-          cp dist/assets/*.js cdn-assets/script.js
+          # Copy the files (they already have consistent names from vite config)
+          cp dist/assets/style.css cdn-assets/
+          cp dist/assets/script.js cdn-assets/
           
           # Copy other assets that might be needed
           cp dist/favicon.ico cdn-assets/
