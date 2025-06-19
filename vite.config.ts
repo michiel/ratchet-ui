@@ -5,17 +5,21 @@ export default defineConfig({
   plugins: [react()],
   build: {
     cssCodeSplit: false,
+    lib: {
+      entry: './src/index.tsx',
+      name: 'RatchetUI',
+      formats: ['iife'],
+      fileName: () => 'script.js'
+    },
     rollupOptions: {
       output: {
-        format: 'iife',
-        name: 'RatchetUI',
         assetFileNames: (assetInfo) => {
           if (assetInfo.name && assetInfo.name.endsWith('.css')) {
-            return 'assets/style.css';
+            return 'style.css';
           }
-          return 'assets/[name].[ext]';
+          return '[name].[ext]';
         },
-        entryFileNames: 'assets/script.js'
+        dir: 'dist/assets'
       }
     }
   }
